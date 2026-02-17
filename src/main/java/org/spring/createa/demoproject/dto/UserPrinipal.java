@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import lombok.Builder;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.spring.createa.demoproject.domain.User;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,6 +30,7 @@ public class UserPrinipal implements UserDetails, OidcUser {
   }
 
   @Override
+  @NullMarked
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return Collections.singleton(new SimpleGrantedAuthority("USER"));
   }
@@ -39,6 +41,7 @@ public class UserPrinipal implements UserDetails, OidcUser {
   }
 
   @Override
+  @NullMarked
   public String getUsername() {
     return name;
   }
@@ -71,6 +74,7 @@ public class UserPrinipal implements UserDetails, OidcUser {
   }
 
   @Override
+  @NullMarked
   public String getName() {
     return name;
   }

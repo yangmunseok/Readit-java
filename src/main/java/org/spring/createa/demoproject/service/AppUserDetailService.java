@@ -1,5 +1,6 @@
 package org.spring.createa.demoproject.service;
 
+import org.jspecify.annotations.NullMarked;
 import org.spring.createa.demoproject.Repository.UserRepository;
 import org.spring.createa.demoproject.domain.User;
 import org.spring.createa.demoproject.dto.UserPrinipal;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AppUserDetailService implements UserDetailsService {
 
-  private UserRepository userRepository;
+  private final UserRepository userRepository;
 
   @Autowired
   public AppUserDetailService(UserRepository userRepository) {
@@ -20,6 +21,7 @@ public class AppUserDetailService implements UserDetailsService {
   }
 
   @Override
+  @NullMarked
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     User user = userRepository.findUserByName(username);
     if (user == null) {

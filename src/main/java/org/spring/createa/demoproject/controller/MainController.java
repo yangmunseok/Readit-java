@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class MainController {
 
-  private UserService userService;
+  private final UserService userService;
 
   @Autowired
   public MainController(UserService userService) {
