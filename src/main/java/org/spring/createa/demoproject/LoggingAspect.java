@@ -1,0 +1,23 @@
+package org.spring.createa.demoproject;
+
+import java.util.logging.Logger;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.springframework.stereotype.Component;
+
+@Component
+@Aspect
+public class LoggingAspect {
+
+  private Logger logger = Logger.getLogger(LoggingAspect.class.getName());
+
+  @Around("execution(* org.spring.createa.demoproject.service.Data4LibraryService.*(..))")
+  public Object log(ProceedingJoinPoint joinPoint) throws Throwable {
+    long start = System.currentTimeMillis();
+    Object returnedByMethod = joinPoint.proceed();
+    logger.info(joinPoint.getSignature().getName() + " took " + Long.toString(
+        System.currentTimeMillis() - start) + "ms");
+    return returnedByMethod;
+  }
+}

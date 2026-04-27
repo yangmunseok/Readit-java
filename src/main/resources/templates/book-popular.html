@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="csrf-header" th:content="${_csrf.headerName}">
+  <meta name="csrf-token" th:content="${_csrf.token}">
+  <title>Title</title>
+  <link th:href="@{/app.css}" rel="stylesheet"/>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+<div class="relative text-white font-pretendard overflow-x-hidden">
+  <header
+      class="flex flex-col w-full justify-evenly bg-black/60 bg-[url(/images/Background2.jpg)] bg-blend-multiply bg-cover bg-center">
+    <nav class="px-2 w-full h-8 lg:h-12 bg-black/10  border-b border-b-white/10">
+      <div class="w-full max-w-7xl h-full flex justify-between items-center p-2 mx-auto">
+        <p class="font-bold font-sans text-xl lg:text-2xl">Readit</p>
+        <button
+            class="text-sm lg:text-base font-pretendard hover:text-stone-200"
+            onclick="logout()"
+        >
+          logout
+        </button>
+      </div>
+    </nav>
+    <div class="flex flex-col mx-auto items-baseline gap-10 lg:gap-20 py-20 w-full max-w-7xl px-5">
+      <p class="font-semibold text-3xl lg:text-5xl">
+        도서 검색부터 책 위치 확인, 리뷰 공유까지, 한곳에서!
+      </p>
+      <form
+          method="get"
+          action="/books"
+          role="search"
+          class="relative w-full flex items-center"
+      >
+        <input
+            type="text"
+            name="keyword"
+            class="w-full bg-white text-stone-600 text-base p-4"
+            placeholder="원하시는 도서를 검색해주세요"
+        />
+        <button type="submit" class="absolute right-4">
+          <i class="fa-solid fa-magnifying-glass text-black"></i>
+        </button>
+      </form>
+    </div>
+  </header>
+  <div class="mt-20 text-black w-full max-w-7xl mx-auto p-2">
+    <div
+        class="flex gap-4 lg:justify-between w-full border-b border-t border-stone-500 text-xl lg:text-2xl p-2 overflow-x-scroll lg:overflow-x-hidden">
+      <th:block th:each="category: ${categories}">
+        <span th:if="${category}==${currentCategory}" class="bg-stone-900 text-white shrink-0"
+              th:text="${category}"></span>
+        <a th:unless="${category}==${currentCategory}"
+           th:href="@{/books/popular(category=${category})}" class="shrink-0"
+           th:text="${category}"></a>
+      </th:block>
+    </div>
+    <div class="grid grid-cols-3 lg:grid-cols-5 w-full gap-5 mt-10">
+      <article th:each="book: ${books}">
+        <img
+            th:src="${book.bookImageURL}"
+            class="w-full aspect-2/3 border-2 border-stone-200"
+        ></img>
+        <div class="mt-5">
+          <p th:text="${book.ranking}"
+             class="flex items-center justify-center border border-blue-500 rounded-full w-7 h-7 text-blue-700 font-semibold">
+          </p>
+          <span th:text="${book.bookname}" class="font-bold text-lg w-40 mt-4"></span>
+          <span th:unless="${#strings.isEmpty(book.vol)}" class="font-bold text-lg"
+                th:text="${book.vol}"></span>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>
+</body>
+</html>

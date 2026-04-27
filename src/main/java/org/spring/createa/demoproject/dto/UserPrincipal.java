@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import lombok.Builder;
+import lombok.Getter;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.spring.createa.demoproject.domain.User;
@@ -15,8 +16,9 @@ import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 @Builder
-public class UserPrinipal implements UserDetails, OidcUser {
+public class UserPrincipal implements UserDetails, OidcUser {
 
+  @Getter
   private User user;
   private Map<String, Object> attributes;
   private Map<String, Object> claims;
@@ -93,4 +95,5 @@ public class UserPrinipal implements UserDetails, OidcUser {
   public OidcIdToken getIdToken() {
     return oidcIdToken;
   }
+
 }

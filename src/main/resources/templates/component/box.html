@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src="/js/comment.js"></script>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+<a th:fragment="bookBox(book)"
+   th:href="@{/books/{isbn13}(isbn13=${book.isbn13})}"
+   class="flex items-start w-full gap-5 lg:gap-20 border-b border-stone-500 py-5">
+
+  <!-- 이미지 -->
+  <div
+      class="shrink-0 w-30 lg:w-45 aspect-[2/3] overflow-hidden bg-stone-200 flex justify-center items-center">
+    <img
+        th:src="${book.bookImageURL}"
+        class="w-full h-full object-contain"
+    />
+  </div>
+
+  <!-- 텍스트 (좌측 정렬) -->
+  <div class="flex flex-col gap-1 text-left w-full">
+    <span th:text="${book.bookname}" class="font-bold text-base lg:text-lg"></span>
+
+    <span th:if="${book.vol}"
+          th:text="${book.vol}"
+          class="font-bold text-base lg:text-lg"></span>
+
+    <p th:text="${book.authors}"
+       class="text-xs lg:text-sm text-stone-400"></p>
+
+    <p th:text="${book.description}"
+       class="text-base lg:text-lg text-stone-400 mt-2"></p>
+  </div>
+
+</a>
+<th:block th:fragment="commentBox(comment,user)">
+  <div th:id="'comment-box-'+${comment.id}" class="w-full">
+    <div
+        th:class="'default-menu-'+${comment.id}+' w-full rounded-sm border border-stone-300 p-2 pl-3'">
+      <div class="flex justify-between">
+        <div class="flex gap-2 items-center">
+          <span>
+            <img
+                src="/images/avatar.png"
+                class="rounded-full w-15 h-15 object-cover inline-block"
+            />
+          </span>
+          <p class="font-bold text-lg">
+            Reviewed By
+            <br/>
+            <span class="font-normal" th:text="${comment.commenter.name}"></span>
+          </p>
+        </div>
+
+        <div class="flex">
+          <th:block th:each="star: ${#numbers.sequence(1,5)}">
+            <i th:if="${star}<=${comment.score}"
+               class="fa-solid fa-star text-amber-300 text-lg"></i>
+            <i th:unless="${star}<=${comment.score}"
+               class="fa-regular fa-star text-amber-300 text-lg"></i>
+          </th:block>
+        </div>
+      </div>
+      <p th:text="${comment.content}" class="mt-5 text-lg wrap-anywhere"></p>
+      <div class="relative flex justify-end items-center">
+        <button th:if="${#lists.contains(comment.liker,user)}"
+                th:data-csrf-header="${_csrf.headerName}"
+                th:data-csrf-token="${_csrf.token}" class="text-red-800 flex"
+                th:onclick="|likeOrUnlikeReview(${comment.id},this.getAttribute('data-csrf-header'),this.getAttribute('data-csrf-token'))|">
+          <i class="fa-solid fa-thumbs-up text-red-800"></i>
+          <span th:text="${comment.likes}"></span>
+        </button>
+        <button th:unless="${#lists.contains(comment.liker,user)}"
+                th:data-csrf-header="${_csrf.headerName}"
+                th:data-csrf-token="${_csrf.token}" class="text-black flex"
+                th:onclick="|likeOrUnlikeReview(${comment.id},this.getAttribute('data-csrf-header'),this.getAttribute('data-csrf-token'))|">
+          <i class="fa-regular fa-thumbs-up"></i>
+          <span th:text="${comment.likes}"></span>
+        </button>
+
+        <button th:if="${comment.commenter.equals(user)}"
+                th:onclick="|switchMenuState(${comment.id})|"
+                class="hover:text-stone-700"
+        >
+          <i class="fa-solid fa-ellipsis-vertical"></i>
+        </button>
+        <div
+            th:class="'comment-menu-'+${comment.id}+' absolute p-2 top-full right-0 border rounded-sm bg-white hidden'">
+          <button th:onclick="|startEditingMode(${comment.id})|" class="hover:bg-stone-200">
+            수정
+          </button>
+          <button
+              th:data-csrf-header="${_csrf.headerName}"
+              th:data-csrf-token="${_csrf.token}"
+              th:onclick="|deleteReview(${comment.id},this.getAttribute('data-csrf-header'),this.getAttribute('data-csrf-token'))|"
+              class="hover:bg-stone-200">
+            삭제
+          </button>
+        </div>
+
+      </div>
+    </div>
+    <div
+        th:class="'editing-menu-'+${comment.id}+' w-full rounded-sm border border-stone-300 p-2 pl-3 hidden'">
+      <form action="/comments" method="post">
+        <input type="hidden" name="id" th:value="${comment.id}"/>
+        <input type="hidden" name="_method" value="patch"/>
+        <input type="hidden"
+               th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}"/>
+        <div class="flex flex-col gap-2">
+          <div class="flex justify-between">
+            <div class="flex gap-1 items-center">
+              <img
+                  src="/images/avatar.png"
+                  class="h-10 w-10 object-cover inline-block"
+              />
+              <p th:text="${user.name}"></p>
+            </div>
+            <div class="flex">
+              <th:block th:each="star: ${#numbers.sequence(1,5)}">
+                <label th:for="'star'+${star}+'-'+${comment.id}">
+                  <i th:class="'edit-score-'+${comment.id}+' fa-regular fa-star text-amber-300 text-lg'"></i>
+                </label>
+              </th:block>
+
+            </div>
+          </div>
+
+          <input type="text" name="content" th:placeholder="${comment.content}"
+                 class="rounded-sm bg-stone-100 w-full h-20 outline-none"/>
+          <button type="submit" th:onclick="|switchEditingState(${comment.id})|"
+                  class="self-end rounded-sm bg-sky-500 p-2 hover:bg-sky-400 text-white font-bold">
+            수정
+          </button>
+        </div>
+        <input type="radio" name="score" th:id="'star1-'+${comment.id}" value=1
+               th:onclick="|renderEditScore(${comment.id},1)|"
+               class="hidden"/>
+        <input type="radio" name="score" th:id="'star2-'+${comment.id}" value=2
+               th:onclick="|renderEditScore(${comment.id},2)|"
+               class="hidden"/>
+        <input type="radio" name="score" th:id="'star3-'+${comment.id}" value=3
+               th:onclick="|renderEditScore(${comment.id},3)|"
+               class="hidden"/>
+        <input type="radio" name="score" th:id="'star4-'+${comment.id}" value=4
+               th:onclick="|renderEditScore(${comment.id},4)|"
+               class="hidden"/>
+        <input type="radio" name="score" th:id="'star5-'+${comment.id}" value=5
+               th:onclick="|renderEditScore(${comment.id},5)|"
+               class="hidden"/>
+      </form>
+
+    </div>
+  </div>
+</th:block>
+</body>
+</html>

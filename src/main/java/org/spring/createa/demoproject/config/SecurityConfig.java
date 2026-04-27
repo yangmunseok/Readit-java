@@ -28,10 +28,12 @@ public class SecurityConfig {
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
+
     return httpSecurity
         .csrf(csrf -> csrf.ignoringRequestMatchers("/register"))
         .authorizeHttpRequests(
-            auth -> auth.requestMatchers("/register", "/login", "/oauth2").permitAll()
+            auth -> auth.requestMatchers("/register", "/login", "/oauth2", "/app.css", "/images/**",
+                    "/fonts/**").permitAll()
                 .anyRequest()
                 .authenticated())
         .formLogin(

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="csrf-header" th:content="${_csrf.headerName}">
+  <meta name="csrf-token" th:content="${_csrf.token}">
+  <title>Title</title>
+  <link th:href="@{/app.css}" rel="stylesheet"/>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script src="/js/logout.js"></script>
+</head>
+<body>
+<div class="relative font-pretendard max-w-screen overflow-x-hidden h-screen">
+  <header
+      class="flex flex-col w-full justify-evenly text-white bg-black/60 bg-[url(/images/Background2.jpg)] bg-blend-multiply bg-cover bg-center">
+    <nav class="px-2 w-full h-8 lg:h-12 bg-black/10  border-b border-b-white/10">
+      <div class="w-full max-w-7xl h-full flex justify-between items-center p-2 mx-auto">
+        <a href="/home" class="font-bold font-sans text-xl lg:text-2xl">
+          Readit
+        </a>
+        <button onclick="logout()"
+                class="text-sm lg:text-base font-pretendard hover:text-stone-200">
+          logout
+        </button>
+      </div>
+    </nav>
+    <div class="flex flex-col mx-auto items-baseline gap-10 lg:gap-20 py-20 w-full max-w-7xl px-5">
+      <p class="font-semibold text-3xl lg:text-5xl">
+        도서 검색부터 책 위치 확인, 리뷰 공유까지, 한곳에서!
+      </p>
+      <form
+          method="get"
+          action="/books"
+          role="search"
+          class="relative w-full flex items-center"
+      >
+        <input
+            type="text"
+            name="keyword"
+            class="w-full bg-white text-stone-600 text-base p-4"
+            placeholder="원하시는 도서를 검색해주세요"
+        />
+        <button type="submit" class="absolute right-4">
+          <i class="fa-solid fa-magnifying-glass text-black"></i>
+        </button>
+      </form>
+    </div>
+  </header>
+  <div class="text-center">
+    <div class="mt-50">
+      <p class="font-black text-3xl lg:text-8xl">404</p>
+      <p class="mt-10 lg:text-2xl">
+        The page you are looking for can't be found
+      </p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,27 @@
+@import "tailwindcss";
+@source "../../resources/templates/**/*.html";
+
+@font-face {
+  font-family: 'Pretendard';
+  src: url('../../resources/static/fonts/Pretendard-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  src: url('../../resources/static/fonts/Pretendard-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  src: url('../../resources/static/fonts/Pretendard-Black.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+}
+
+body {
+  font-family: Pretendard, serif;
+}

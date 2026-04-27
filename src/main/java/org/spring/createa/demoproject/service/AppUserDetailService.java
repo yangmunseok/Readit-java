@@ -3,7 +3,7 @@ package org.spring.createa.demoproject.service;
 import org.jspecify.annotations.NullMarked;
 import org.spring.createa.demoproject.Repository.UserRepository;
 import org.spring.createa.demoproject.domain.User;
-import org.spring.createa.demoproject.dto.UserPrinipal;
+import org.spring.createa.demoproject.dto.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -28,6 +28,6 @@ public class AppUserDetailService implements UserDetailsService {
       throw new UsernameNotFoundException("username not found");
     }
 
-    return UserPrinipal.builder().user(user).name(user.getName()).build();
+    return UserPrincipal.builder().user(user).name(user.getName()).build();
   }
 }
