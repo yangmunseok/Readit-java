@@ -48,7 +48,6 @@ public class BookController {
   String home(@AuthenticationPrincipal UserPrincipal user, Model model) {
 
     User currentUser = user.getUser();
-    System.out.println("current:" + currentUser);
     List<Book> recommendBooks = getRecommendedBooks(currentUser.getBookOfInterest());
     List<RankedBook> popularBooks = data4LibraryService.getPopularBooks(6, null, authKey, "json")
         .response()
