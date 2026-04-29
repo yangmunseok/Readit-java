@@ -30,15 +30,17 @@ public class SecurityConfig {
   SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
 
     return httpSecurity
-        .csrf(csrf -> csrf.ignoringRequestMatchers("/register"))
         .authorizeHttpRequests(
-            auth -> auth.requestMatchers("/register", "/login", "/oauth2", "/app.css", "/images/**",
+            auth -> auth.requestMatchers("/register", "/login", "/signup", "/test", "/oauth2",
+                    "/app.css",
+                    "/images/**",
                     "/fonts/**").permitAll()
                 .anyRequest()
                 .authenticated())
         .formLogin(
-            form -> form.loginPage("/login").loginProcessingUrl("/login").defaultSuccessUrl("/"))
-        .oauth2Login(oauth -> oauth.loginPage("/login").defaultSuccessUrl("/")
+            form -> form.loginPage("/login").loginProcessingUrl("/login")
+                .defaultSuccessUrl("/home", true))
+        .oauth2Login(oauth -> oauth.loginPage("/login").defaultSuccessUrl("/home", true)
             .userInfoEndpoint(user -> user.oidcUserService(customOidcUserService)))
         .build();
   }

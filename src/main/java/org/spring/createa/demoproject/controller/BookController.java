@@ -4,7 +4,6 @@ package org.spring.createa.demoproject.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import org.spring.createa.demoproject.domain.User;
 import org.spring.createa.demoproject.dto.Book;
@@ -13,7 +12,7 @@ import org.spring.createa.demoproject.dto.UserPrincipal;
 import org.spring.createa.demoproject.dto.response.PopularBookResponse.RankedBook;
 import org.spring.createa.demoproject.dto.response.SearchBooksResponse.BookDoc;
 import org.spring.createa.demoproject.service.CommentService;
-import org.spring.createa.demoproject.service.Data4LibraryService;
+import org.spring.createa.demoproject.service.Data4LibraryServiceAdapter;
 import org.spring.createa.demoproject.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,18 +26,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class BookController {
 
-  private Logger logger = Logger.getLogger(BookController.class.getName());
-
   private final CommentService commentService;
-  Data4LibraryService data4LibraryService;
+  Data4LibraryServiceAdapter data4LibraryServiceAdapter;
   UserService userService;
   @Value("${api.data4library.key}")
   String authKey;
 
   @Autowired
-  public BookController(Data4LibraryService data4LibraryService, UserService userService,
+  public BookController(Data4LibraryServiceAdapter data4LibraryServiceAdapter,
+      UserService userService,
       CommentService commentService) {
-    this.data4LibraryService = data4LibraryService;
+    this.data4LibraryServiceAdapter = data4LibraryServiceAdapter;
     this.userService = userService;
     this.commentService = commentService;
   }
@@ -49,20 +47,22 @@ public class BookController {
 
     User currentUser = user.getUser();
     List<Book> recommendBooks = getRecommendedBooks(currentUser.getBookOfInterest());
-    List<RankedBook> popularBooks = data4LibraryService.getPopularBooks(6, null, authKey, "json")
-        .response()
-        .docs().stream()
-        .map(doc -> doc.doc()).toList();
+    List<RankedBook> popularBooks = data4LibraryServiceAdapter.getPopularBooks(authKey);
     model.addAttribute("recommendedBooks", recommendBooks);
     model.addAttribute("bookRanks", popularBooks);
     model.addAttribute("user", currentUser);
     return "home";
   }
 
+  @GetMapping("/getPopularBooks")
+  public List<RankedBook> getPopularBooks() {
+    return data4LibraryServiceAdapter.getPopularBooks(authKey);
+  }
+
   @GetMapping("/books/{isbn}")
   String getBookByIsbn(@AuthenticationPrincipal UserPrincipal user, @PathVariable String isbn,
       Model model) {
-    Book book = data4LibraryService.getBookByIsbn(isbn, authKey, "json").response().detail()
+    Book book = data4LibraryServiceAdapter.getBookByIsbn(isbn, authKey, "json").response().detail()
         .getFirst()
         .book();
     model.addAttribute("book", book);
@@ -103,7 +103,7 @@ public class BookController {
     if (category == null) {
       category = "전체";
     }
-    List<RankedBook> popularBooks = data4LibraryService.getPopularBooks(null,
+    List<RankedBook> popularBooks = data4LibraryServiceAdapter.getPopularBooks(null,
             categories.get(category), authKey, "json").response().docs().stream()
         .map(doc -> doc.doc()).toList();
 
@@ -117,7 +117,7 @@ public class BookController {
     if (isbn.isEmpty()) {
       return new ArrayList<>();
     }
-    return data4LibraryService.getBookRecommendation(
+    return data4LibraryServiceAdapter.getBookRecommendation(
             isbn.stream().reduce("", (a, b) -> a + ";" + b),
             authKey, "json").response().docs().stream()
         .map(doc -> doc.book()).toList();
@@ -131,7 +131,8 @@ public class BookController {
       @RequestParam(required = false) Integer pageSize,
       @AuthenticationPrincipal UserPrincipal userPrincipal,
       Model model) {
-    var searchResult = data4LibraryService.searchBooks(isbn13, keyword, publisher, pageNo, pageSize,
+    var searchResult = data4LibraryServiceAdapter.searchBooks(isbn13, keyword, publisher, pageNo,
+        pageSize,
         authKey,
         "json").response();
 
@@ -158,9 +159,9 @@ public class BookController {
   @GetMapping("/libraries")
   String searchLibraries(@RequestParam long isbn, @RequestParam int region,
       @RequestParam(required = false) Integer dtlRegion, Model model) {
-    List<Library> libraries = data4LibraryService.searchLibraries(isbn, region, authKey, "json")
+    List<Library> libraries = data4LibraryServiceAdapter.searchLibraries(isbn, region, authKey,
+            "json")
         .response().libs().stream().map(doc -> doc.lib()).toList();
-    System.out.println(data4LibraryService.searchLibraries(isbn, region, authKey, "json"));
     if (libraries == null) {
       libraries = new ArrayList<Library>();
     }

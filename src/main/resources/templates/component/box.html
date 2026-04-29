@@ -131,7 +131,7 @@
             </div>
           </div>
 
-          <input type="text" name="content" th:placeholder="${comment.content}"
+          <input type="text" name="content" th:value="${comment.content}"
                  class="rounded-sm bg-stone-100 w-full h-20 outline-none"/>
           <button type="submit" th:onclick="|switchEditingState(${comment.id})|"
                   class="self-end rounded-sm bg-sky-500 p-2 hover:bg-sky-400 text-white font-bold">

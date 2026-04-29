@@ -1,6 +1,6 @@
 package org.spring.createa.demoproject.service;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import org.spring.createa.demoproject.Repository.UserRepository;
 import org.spring.createa.demoproject.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class UserService {
   }
 
   public void updateBookOfInterest(User user, String isbn13) {
-    LinkedList<String> books = (LinkedList<String>) user.getBookOfInterest();
+    ArrayList<String> books = (ArrayList<String>) user.getBookOfInterest();
     if (!books.contains(isbn13)) {
       books.add(isbn13);
     }
