@@ -49,6 +49,12 @@ public class MainController {
     return "alive!";
   }
 
+  @GetMapping("/ping")
+  @ResponseBody
+  public String ping() {
+    return "hello";
+  }
+
   @PostMapping("/register")
   public String register(@ModelAttribute User user, HttpServletRequest request) {
     userService.register(user);
