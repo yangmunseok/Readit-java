@@ -31,7 +31,8 @@ public class SecurityConfig {
 
     return httpSecurity
         .authorizeHttpRequests(
-            auth -> auth.requestMatchers("/register", "/login", "/signup", "/test", "/oauth2",
+            auth -> auth.requestMatchers("/register", "/ping", "/login", "/signup", "/test",
+                    "/oauth2",
                     "/app.css",
                     "/images/**",
                     "/fonts/**").permitAll()
