@@ -3,9 +3,7 @@ package org.spring.createa.demoproject.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.spring.createa.demoproject.domain.User;
-import org.spring.createa.demoproject.service.Data4LibraryServiceAdapter;
 import org.spring.createa.demoproject.service.UserService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -25,28 +23,17 @@ public class MainController {
 
   private final UserService userService;
   private final UserDetailsService userDetailsService;
-  private final Data4LibraryServiceAdapter data4LibraryServiceAdapter;
-  @Value("${api.data4library.key}")
-  String authKey;
 
-  public MainController(UserService userService, UserDetailsService userDetailsService,
-      Data4LibraryServiceAdapter data4LibraryServiceAdapter) {
+
+  public MainController(UserService userService, UserDetailsService userDetailsService) {
     this.userService = userService;
     this.userDetailsService = userDetailsService;
-    this.data4LibraryServiceAdapter = data4LibraryServiceAdapter;
   }
 
   @GetMapping("/findUser")
   @ResponseBody
   public User findUser(@RequestParam int id) {
     return userService.findUserById(id);
-  }
-
-  @GetMapping("/test")
-  @ResponseBody
-  public String test() {
-    data4LibraryServiceAdapter.getPopularBooks(authKey);
-    return "alive!";
   }
 
   @GetMapping("/ping")
