@@ -9,7 +9,6 @@ import org.spring.createa.demoproject.dto.response.SearchLibrariesResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,14 +33,6 @@ public class Data4LibraryServiceAdapter {
   public PopularBookResponse getPopularBooks(Integer pageSize,
       String kdc) {
     return data4LibraryService.getPopularBooks(pageSize, kdc, authKey, format);
-  }
-
-  @Scheduled(fixedRate = 3600000 * 24)
-  public void updateBookCache() {
-    for (int i = 1; i < 10; i++) {
-      cachingGetPopularBooks(null, Integer.toString(i));
-    }
-    cachingGetPopularBooks(null, null);
   }
 
   @CachePut(value = "books", key = "#kdc == null ? 'ALL' : #kdc")
