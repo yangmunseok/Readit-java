@@ -5,9 +5,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Schdeduler {
+public class Scheduler {
 
   Data4LibraryServiceAdapter data4LibraryServiceAdapter;
+
+  public Scheduler(Data4LibraryServiceAdapter data4LibraryServiceAdapter) {
+    this.data4LibraryServiceAdapter = data4LibraryServiceAdapter;
+  }
 
   @Scheduled(fixedRate = 3600000 * 24)
   public void updateBookCache() {
