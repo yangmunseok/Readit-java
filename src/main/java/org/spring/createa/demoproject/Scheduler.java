@@ -26,7 +26,7 @@ public class Scheduler {
         try {
           PopularBookResponse response = data4LibraryServiceAdapter.cachingGetPopularBooks(null,
               Integer.toString(i));
-          logger.info("Cached books for category: {}, response: {}", i, response);
+          logger.info("Cached books for category: {}", i);
         } catch (Exception e) {
           logger.error("Failed to cache books for category: {}", i, e);
         }
@@ -35,7 +35,7 @@ public class Scheduler {
       try {
         PopularBookResponse response = data4LibraryServiceAdapter.cachingGetPopularBooks(null,
             null);
-        logger.info("Cached all popular books, response: {}", response);
+        logger.info("Cached all popular books");
       } catch (Exception e) {
         logger.error("Failed to cache all popular books", e);
       }
