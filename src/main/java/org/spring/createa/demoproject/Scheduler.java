@@ -22,7 +22,7 @@ public class Scheduler {
   public void updateBookCache() {
     try {
       logger.info("Cache update started");
-      for (int i = 1; i < 10; i++) {
+      for (int i = 0; i < 10; i++) {
         try {
           PopularBookResponse response = data4LibraryServiceAdapter.cachingGetPopularBooks(null,
               Integer.toString(i));
@@ -34,7 +34,7 @@ public class Scheduler {
 
       try {
         PopularBookResponse response = data4LibraryServiceAdapter.cachingGetPopularBooks(null,
-            null);
+            "");
         logger.info("Cached all popular books");
       } catch (Exception e) {
         logger.error("Failed to cache all popular books", e);
