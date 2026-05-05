@@ -106,6 +106,9 @@
               <version>1.18.46</version>
             </path>
           </annotationProcessorPaths>
+          <source>11</source>
+          <target>11</target>
+          <parameters>true</parameters>
         </configuration>
       </plugin>
       <plugin>
