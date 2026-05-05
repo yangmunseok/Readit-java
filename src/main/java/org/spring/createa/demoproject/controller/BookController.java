@@ -72,7 +72,7 @@ public class BookController {
   @GetMapping("/books/popular")
   String getPopularBooks(@RequestParam(required = false) String category, Model model) {
     Map<String, String> categories = Map.ofEntries(
-        Map.entry("전체", ""),
+        Map.entry("전체", "all"),
         Map.entry("총류", "0"),
         Map.entry("철학", "1"),
         Map.entry("종교", "2"),

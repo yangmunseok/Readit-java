@@ -29,15 +29,21 @@ public class Data4LibraryServiceAdapter {
     return data4LibraryService.getBookByIsbn(isbn13, authKey, format);
   }
 
-  @Cacheable(value = "books", key = "#kdc == '' ? 'ALL' : #kdc")
+  @Cacheable(value = "books", key = "#kdc")
   public PopularBookResponse getPopularBooks(Integer pageSize,
       String kdc) {
+    if (kdc.equals("all")) {
+      kdc = "";
+    }
     return data4LibraryService.getPopularBooks(pageSize, kdc, authKey, format);
   }
 
-  @CachePut(value = "books", key = "#kdc == '' ? 'ALL' : #kdc")
+  @CachePut(value = "books", key = "#kdc")
   public PopularBookResponse cachingGetPopularBooks(Integer pageSize,
       String kdc) {
+    if (kdc.equals("all")) {
+      kdc = "";
+    }
     return data4LibraryService.getPopularBooks(pageSize, kdc, authKey, format);
   }
 
