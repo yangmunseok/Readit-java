@@ -38,5 +38,6 @@ public interface Data4LibraryService {
 
   @GetExchange("/libSrchByBook")
   SearchLibrariesResponse searchLibraries(@RequestParam long isbn, @RequestParam int region,
+      @RequestParam int dtl_region,
       @RequestParam String authKey, @RequestParam String format);
 }

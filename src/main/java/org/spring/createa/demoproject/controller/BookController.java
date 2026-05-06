@@ -151,8 +151,8 @@ public class BookController {
 
   @GetMapping("/libraries")
   String searchLibraries(@RequestParam long isbn, @RequestParam int region,
-      @RequestParam(required = false) Integer dtlRegion, Model model) {
-    List<Library> libraries = data4LibraryServiceAdapter.searchLibraries(isbn, region)
+      @RequestParam Integer dtlRegion, Model model) {
+    List<Library> libraries = data4LibraryServiceAdapter.searchLibraries(isbn, region, dtlRegion)
         .response().libs().stream().map(SearchLibrariesResponse.Doc::lib).toList();
     model.addAttribute("libraries", libraries);
     return "book-detail :: #available-libraries";

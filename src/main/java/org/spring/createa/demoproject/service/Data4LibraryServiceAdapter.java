@@ -60,7 +60,7 @@ public class Data4LibraryServiceAdapter {
     return data4LibraryService.getBookRecommendation(isbn13, authKey, format);
   }
 
-  public SearchLibrariesResponse searchLibraries(long isbn, int region) {
-    return data4LibraryService.searchLibraries(isbn, region, authKey, format);
+  public SearchLibrariesResponse searchLibraries(long isbn, int region, int dtl_region) {
+    return data4LibraryService.searchLibraries(isbn, region, dtl_region, authKey, format);
   }
 }
