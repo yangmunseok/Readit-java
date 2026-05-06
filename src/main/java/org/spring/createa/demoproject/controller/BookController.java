@@ -46,7 +46,7 @@ public class BookController {
 
     User currentUser = user.getUser();
     List<Book> recommendBooks = getRecommendedBooks(currentUser.getBookOfInterest());
-    List<RankedBook> popularBooks = data4LibraryServiceAdapter.getPopularBooks(null, null)
+    List<RankedBook> popularBooks = data4LibraryServiceAdapter.getPopularBooks(null, "all")
         .response().docs().stream().map(
             Doc::doc).limit(6).toList();
     model.addAttribute("recommendedBooks", recommendBooks);

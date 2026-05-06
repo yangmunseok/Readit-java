@@ -32,7 +32,7 @@ public class Data4LibraryServiceAdapter {
   @Cacheable(value = "books", key = "#kdc")
   public PopularBookResponse getPopularBooks(Integer pageSize,
       String kdc) {
-    if (kdc.equals("all")) {
+    if ("all".equals(kdc) || kdc == null) {
       kdc = "";
     }
     return data4LibraryService.getPopularBooks(pageSize, kdc, authKey, format);
@@ -41,7 +41,7 @@ public class Data4LibraryServiceAdapter {
   @CachePut(value = "books", key = "#kdc")
   public PopularBookResponse cachingGetPopularBooks(Integer pageSize,
       String kdc) {
-    if (kdc.equals("all")) {
+    if ("all".equals(kdc) || kdc == null) {
       kdc = "";
     }
     return data4LibraryService.getPopularBooks(pageSize, kdc, authKey, format);
