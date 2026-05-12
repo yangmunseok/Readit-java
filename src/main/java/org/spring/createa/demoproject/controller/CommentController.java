@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class CommentController {
@@ -30,8 +31,11 @@ public class CommentController {
 
   @PostMapping("/comments")
   String postComment(@ModelAttribute PostCommentRequestBody body,
-      @AuthenticationPrincipal UserPrincipal userPrincipal) {
-    System.out.println("postComment invoked");
+      @AuthenticationPrincipal UserPrincipal userPrincipal, RedirectAttributes redirectAttributes) {
+    if (body.comment().isBlank() || body.score() == null) {
+      redirectAttributes.addFlashAttribute("error", "댓글 내용이나 점수가 입력되지 않았습니다.");
+      return "redirect:/books/" + body.isbn13();
+    }
     commentService.addComment(body.isbn13(), body.comment(), body.score(), userPrincipal.getUser());
     return "redirect:/books/" + body.isbn13();
   }
