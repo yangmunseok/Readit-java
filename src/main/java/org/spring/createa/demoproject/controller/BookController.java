@@ -11,37 +11,48 @@ import org.spring.createa.demoproject.dto.Library;
 import org.spring.createa.demoproject.dto.UserPrincipal;
 import org.spring.createa.demoproject.dto.response.PopularBookResponse.Doc;
 import org.spring.createa.demoproject.dto.response.PopularBookResponse.RankedBook;
-import org.spring.createa.demoproject.dto.response.SearchBooksResponse.BookDoc;
 import org.spring.createa.demoproject.dto.response.SearchLibrariesResponse;
 import org.spring.createa.demoproject.service.CommentService;
 import org.spring.createa.demoproject.service.Data4LibraryServiceAdapter;
+import org.spring.createa.demoproject.service.NaverBookSearchApi;
 import org.spring.createa.demoproject.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 public class BookController {
 
   private final CommentService commentService;
   Data4LibraryServiceAdapter data4LibraryServiceAdapter;
+  NaverBookSearchApi naverBookSearchApi;
   UserService userService;
+
+  @Value("${api.naverlibrary.client.id}")
+  String NAVER_LIBRARY_API_ID;
+
+  @Value("${api.naverlibrary.client.secret}")
+  String NAVER_LIBRARY_API_SECRET;
 
   @Autowired
   public BookController(Data4LibraryServiceAdapter data4LibraryServiceAdapter,
       UserService userService,
-      CommentService commentService) {
+      CommentService commentService, NaverBookSearchApi naverBookSearchApi) {
     this.data4LibraryServiceAdapter = data4LibraryServiceAdapter;
+    this.naverBookSearchApi = naverBookSearchApi;
     this.userService = userService;
     this.commentService = commentService;
   }
 
 
-  @GetMapping("/home")
+  @GetMapping("/")
   String home(@AuthenticationPrincipal UserPrincipal user, Model model) {
 
     User currentUser = user.getUser();
@@ -58,14 +69,18 @@ public class BookController {
   @GetMapping("/books/{isbn}")
   String getBookByIsbn(@AuthenticationPrincipal UserPrincipal user, @PathVariable String isbn,
       Model model) {
-    Book book = data4LibraryServiceAdapter.getBookByIsbn(isbn).response().detail()
-        .getFirst()
-        .book();
-    model.addAttribute("book", book);
-    model.addAttribute("libraries", new ArrayList<Library>());
-    model.addAttribute("reviews", commentService.findCommentsByIsbn13(isbn));
-    model.addAttribute("user", user.getUser());
-    userService.updateBookOfInterest(user.getUser(), isbn);
+    try {
+      Book book = data4LibraryServiceAdapter.getBookByIsbn(isbn).response().detail()
+          .getFirst()
+          .book();
+      model.addAttribute("book", book);
+      model.addAttribute("libraries", new ArrayList<Library>());
+      model.addAttribute("reviews", commentService.findCommentsByIsbn13(isbn));
+      model.addAttribute("user", user.getUser());
+      userService.updateBookOfInterest(user.getUser(), isbn);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
     return "book-detail";
   }
 
@@ -96,7 +111,7 @@ public class BookController {
         "문학",
         "역사");
 
-    if (category == null) {
+    if (category == null || categories.get(category) == null) {
       category = "전체";
     }
     List<RankedBook> popularBooks = data4LibraryServiceAdapter.getPopularBooks(null,
@@ -121,17 +136,21 @@ public class BookController {
   @GetMapping("/books")
   String searchBook(@RequestParam(required = false) String isbn13,
       @RequestParam(required = false) List<String> keyword,
+      @RequestParam String query,
       @RequestParam(required = false) String publisher,
       @RequestParam(required = false) Integer pageNo,
       @RequestParam(required = false) Integer pageSize,
       @AuthenticationPrincipal UserPrincipal userPrincipal,
       Model model) {
+
+    /*
     var searchResult = data4LibraryServiceAdapter.searchBooks(isbn13, keyword, publisher, pageNo,
         pageSize).response();
 
     List<Book> books = searchResult.docs().stream().map(
         BookDoc::doc).toList();
     model.addAttribute("books", books);
+  */
 
     if (pageNo == null) {
       pageNo = 1;
@@ -140,8 +159,14 @@ public class BookController {
       pageSize = 20;
     }
 
+    int start = pageSize * (pageNo - 1) + 1;
+
+    var naverSearchResult = naverBookSearchApi.searchBooks(query, start, pageSize,
+        NAVER_LIBRARY_API_ID, NAVER_LIBRARY_API_SECRET);
+    model.addAttribute("books", naverSearchResult.items());
+
     model.addAttribute("numbers",
-        IntStream.range(1, (searchResult.numFound() - 1) / pageSize + 2).toArray());
+        IntStream.range(1, (naverSearchResult.total() - 1) / pageSize + 2).toArray());
     model.addAttribute("currentPage", pageNo);
     model.addAttribute("keyword", keyword);
     model.addAttribute("user", userPrincipal.getUser());

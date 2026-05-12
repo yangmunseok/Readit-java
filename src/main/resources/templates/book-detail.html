@@ -4,25 +4,91 @@
   <meta charset="UTF-8">
   <meta name="csrf-header" th:content="${_csrf.headerName}">
   <meta name="csrf-token" th:content="${_csrf.token}">
-  <title>Title</title>
+  <title>도서 정보</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>">
   <link th:href="@{/app.css}" rel="stylesheet"/>
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <script src="/js/load.js"></script>
   <script src="/js/comment.js"></script>
   <script src="/js/logout.js"></script>
+  <link
+      href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css"
+      rel="stylesheet"
+  />
+  <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+  <style>
+    /* TomSelect UI Customization */
+    .ts-wrapper {
+      flex: 1;
+    }
+
+    .ts-control {
+      border: 1px solid var(--color-stone-400) !important;
+      border-radius: var(--radius-sm) !important;
+      padding: 10px 12px !important;
+      font-size: var(--text-base) !important;
+      background-color: var(--color-white) !important;
+      box-shadow: none !important;
+      min-height: 44px !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+
+    .ts-wrapper.focus .ts-control {
+      border-color: var(--color-sky-500) !important;
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-sky-500) 20%, transparent) !important;
+      outline: none !important;
+    }
+
+    .ts-dropdown {
+      border: 1px solid var(--color-stone-200) !important;
+      border-radius: var(--radius-sm) !important;
+      box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1) !important;
+      margin-top: 6px !important;
+      z-index: 50 !important;
+    }
+
+    .ts-dropdown .optgroup-header {
+      font-weight: 700 !important;
+      color: var(--color-stone-700) !important;
+      background: var(--color-stone-100) !important;
+      padding: 8px 12px !important;
+      font-size: 0.875rem !important;
+    }
+
+    .ts-dropdown .option {
+      padding: 10px 12px !important;
+      cursor: pointer !important;
+    }
+
+    .ts-dropdown .active {
+      background-color: var(--color-sky-500) !important;
+      color: white !important;
+    }
+
+    .ts-dropdown .option:hover:not(.active) {
+      background-color: var(--color-stone-100) !important;
+    }
+
+    /* Placeholder Styling */
+    .ts-wrapper .items-placeholder {
+      color: var(--color-stone-400) !important;
+      opacity: 1 !important;
+    }
+  </style>
 </head>
 <body>
 <div class="flex flex-col gap-20 text-black bg-white items-center overflow-x-hidden">
   <div class="h-20 w-full  bg-black text-white">
     <div class="max-w-7xl h-full flex justify-between items-center mx-auto p-2">
-      <a href="/home" class="font-bold text-xl lg:text-2xl">
+      <a href="/" class="font-bold text-xl lg:text-2xl">
         Readit
       </a>
       <p class="font-medium text-md lg:text-lg">책 상세정보</p>
       <button onclick="logout()" class="font-normal text-xs lg:text-sm">
         <i class="fa-solid fa-arrow-right-from-bracket inline-block mr-1 size-6"></i>
-        logout
+        로그아웃
       </button>
     </div>
   </div>
@@ -62,12 +128,13 @@
   <div class="w-full max-w-7xl border-t-2 border-stone-200 p-2 lg:p-0">
     <p class="font-bold text-2xl mt-5">도서를 소장한 도서관을 찾기</p>
     <div class="mt-5 mb-10">
-      <p>지역 선택</p>
-      <div class="w-full flex justify-between gap-5">
+      <p class="mb-2 text-stone-700 font-medium">지역 선택</p>
+      <div class="w-full flex items-stretch gap-3">
         <select
+            id="region-select"
             name="region"
-            class="outline-none border border-stone-400 flex-1 rounded-sm"
         >
+          <option value="" selected disabled>검색하고 싶은 지역을 선택하세요...</option>
           <optgroup label="서울특별시">
             <option value="11,11010"> 종로구</option>
             <option value="11,11020"> 중구</option>
@@ -376,7 +443,6 @@
 
     <p class="font-bold text-2xl mb-5">검색 결과</p>
     <div class="flex flex-col gap-2" id="available-libraries">
-      <img th:if="${#lists.size(libraries)==0}" src="/images/NoResult.png" class="size-100"/>
       <div th:each="library : ${libraries}">
         <div
             class="border-stone-200 border rounded-sm bg-white shadow-2xl flex items-center p-5 gap-5">
@@ -423,7 +489,7 @@
             <p th:text="${user.name}" class="text-lg m-1"></p>
           </div>
         </div>
-        <form method="post" action="/comments">
+        <form id="comment-form" method="post" action="/comments">
           <div class="flex items-center">
             <label th:each="star: ${#numbers.sequence(1,5)}" th:for="'star'+${star}">
               <i class="fa-regular fa-star text-amber-300 text-lg score"></i>
@@ -493,7 +559,6 @@
 </div>
 <script>
   function renderScore(score) {
-    console.log("renderScore(" + score + ") invoked")
     let labels = document.querySelectorAll(".score");
     labels.forEach((el, idx) => {
       if (idx < score) {
@@ -505,6 +570,15 @@
       el.classList.remove("fa-solid");
     })
   }
+
+  new TomSelect("#region-select", {
+    create: false,
+    placeholder: "검색하고 싶은 지역을 검색하세요...",
+    sortField: {
+      field: "text",
+      direction: "asc"
+    }
+  });
 </script>
 </body>
 </html>

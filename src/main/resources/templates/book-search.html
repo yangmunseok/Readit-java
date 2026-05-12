@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="csrf-header" th:content="${_csrf.headerName}">
   <meta name="csrf-token" th:content="${_csrf.token}">
-  <title>Title</title>
+  <title>도서 검색</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>">
   <script src="/js/pagination.js"></script>
   <script src="/js/logout.js"></script>
   <link th:href="@{/app.css}" rel="stylesheet"/>
@@ -14,25 +15,40 @@
 <body>
 <div class="bg-stone-100 overflow-x-hidden px-2">
   <div class="flex max-w-6xl mx-auto items-center justify-between py-10 lg:py-20">
-    <div class="relative max-w-5xl">
-      <form
-          method="get"
-          action="/books"
-          role="search"
-          class="relative flex w-full h-15 items-center mb-10 lg:mb-20"
-      >
-        <input
-            type="search"
-            name="keyword"
-            class="border border-stone-200 w-full h-full p-2 text-stone-700 text-lg bg-white"
-        />
-        <button type="submit" class="absolute right-3">
-          <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
-      </form>
+    <div class="relative max-w-5xl w-full">
+      <div class="flex items-center mb-10 lg:mb-20 gap-5">
+        <a href="/" class="text-stone-700 hover:text-stone-900 transition-colors flex items-center">
+          <i class="fa-solid fa-arrow-left fa-xl"></i>
+        </a>
+        <form
+            method="get"
+            action="/books"
+            role="search"
+            class="relative flex flex-1 h-15 items-center"
+        >
+          <input
+              type="search"
+              name="query"
+              class="border border-stone-200 w-full h-full p-2 text-stone-700 text-lg bg-white"
+          />
+          <button type="submit" class="absolute right-3">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </form>
+      </div>
       <th:block th:each="book: ${books}">
         <th:block th:replace="~{component/box :: bookBox(book=${book})}"></th:block>
       </th:block>
+
+      <!-- 검색 결과 없음 UI -->
+      <div th:if="${#lists.isEmpty(books)}" class="flex flex-col items-center justify-center py-20 w-full">
+        <img src="/images/NoResult.png" alt="No Result" class="w-60 h-60 object-contain opacity-50 mb-10"/>
+        <p class="text-2xl font-bold text-stone-700">검색 결과가 없습니다.</p>
+        <p class="text-stone-500 mt-2">다른 키워드로 다시 검색해 보세요.</p>
+        <a href="/" class="mt-10 px-6 py-3 bg-stone-900 text-white rounded-sm font-bold hover:bg-black transition-colors">
+          홈으로 돌아가기
+        </a>
+      </div>
     </div>
     <button
         class="hidden lg:flex h-15 items-center gap-1 self-baseline p-2"
@@ -45,7 +61,7 @@
     </button>
   </div>
 
-  <ol class="flex justify-center py-5">
+  <ol th:if="${not #lists.isEmpty(books)}" class="flex justify-center py-5">
     <li class="flex text-black w-10 h-10 justify-center items-center">
       <button onClick=handleBackward()><</button>
     </li>

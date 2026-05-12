@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="csrf-header" th:content="${_csrf.headerName}">
   <meta name="csrf-token" th:content="${_csrf.token}">
-  <title>Title</title>
+  <title>도서 랭킹</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>">
   <link th:href="@{/app.css}" rel="stylesheet"/>
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
@@ -16,12 +17,12 @@
       class="flex flex-col w-full justify-evenly bg-black/60 bg-[url(/images/Background2.jpg)] bg-blend-multiply bg-cover bg-center">
     <nav class="px-2 w-full h-8 lg:h-12 bg-black/10  border-b border-b-white/10">
       <div class="w-full max-w-7xl h-full flex justify-between items-center p-2 mx-auto">
-        <p class="font-bold font-sans text-xl lg:text-2xl">Readit</p>
+        <a href="/" class="font-bold font-sans text-xl lg:text-2xl">Readit</a>
         <button
             class="text-sm lg:text-base font-pretendard hover:text-stone-200"
             onclick="logout()"
         >
-          logout
+          로그아웃
         </button>
       </div>
     </nav>
@@ -37,7 +38,7 @@
       >
         <input
             type="text"
-            name="keyword"
+            name="query"
             class="w-full bg-white text-stone-600 text-base p-4"
             placeholder="원하시는 도서를 검색해주세요"
         />
@@ -63,7 +64,7 @@
         <img
             th:src="${book.bookImageURL}"
             class="w-full aspect-2/3 border-2 border-stone-200"
-        ></img>
+            loading="lazy"></img>
         <div class="mt-5">
           <p th:text="${book.ranking}"
              class="flex items-center justify-center border border-blue-500 rounded-full w-7 h-7 text-blue-700 font-semibold">

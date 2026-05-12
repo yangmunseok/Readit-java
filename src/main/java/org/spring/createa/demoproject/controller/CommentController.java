@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,7 +29,7 @@ public class CommentController {
   }
 
   @PostMapping("/comments")
-  String postComment(PostCommentRequestBody body,
+  String postComment(@ModelAttribute PostCommentRequestBody body,
       @AuthenticationPrincipal UserPrincipal userPrincipal) {
     System.out.println("postComment invoked");
     commentService.addComment(body.isbn13(), body.comment(), body.score(), userPrincipal.getUser());

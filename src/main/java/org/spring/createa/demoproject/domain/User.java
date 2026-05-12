@@ -1,5 +1,6 @@
 package org.spring.createa.demoproject.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,7 +23,10 @@ public class User {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
   private String password;
+
+  @Column(unique = true)
   private String email;
+  @Column(unique = true)
   private String name;
   private String role;
   private String provider = "local";

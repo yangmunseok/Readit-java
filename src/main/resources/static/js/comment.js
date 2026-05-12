@@ -1,6 +1,45 @@
 let showMenu = false;
 let isEditing = false;
 let score = 0;
+let isLoading = false;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const commentForm = document.getElementById("comment-form");
+  const submitButton = commentForm.querySelector('button')
+  //const csrfToken = commentForm.querySelector(
+  //    'input[name="_csrf"]'
+  //).value;
+  commentForm.addEventListener("submit", (e) => {
+    //e.preventDefault();
+    submitButton.disabled = true;
+    /*
+    if (isLoading) {
+      return;
+    }
+    isLoading = true;
+    submitButton.disabled = true;
+    console.log(commentForm.comment);
+    console.log(commentForm.score);
+    console.log(commentForm);
+    fetch("/comments",
+        {
+          method: "POST",
+          headers: {
+            "X-CSRF-TOKEN": csrfToken,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            comment: commentForm.comment.value,
+            score: commentForm.score.value,
+            isbn13: commentForm.isbn13.value
+          })
+        }).then(() => {
+      isLoading = false
+      submitButton.disabled = false;
+    });
+     */
+  })
+})
 
 function switchMenuState(id) {
   console.log("switchMenuState invoked");

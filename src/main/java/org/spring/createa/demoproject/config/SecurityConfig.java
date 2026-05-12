@@ -40,8 +40,8 @@ public class SecurityConfig {
                 .authenticated())
         .formLogin(
             form -> form.loginPage("/login").loginProcessingUrl("/login")
-                .defaultSuccessUrl("/home", true))
-        .oauth2Login(oauth -> oauth.loginPage("/login").defaultSuccessUrl("/home", true)
+                .defaultSuccessUrl("/", true).failureUrl("/login?error=true"))
+        .oauth2Login(oauth -> oauth.loginPage("/login").defaultSuccessUrl("/", true)
             .userInfoEndpoint(user -> user.oidcUserService(customOidcUserService)))
         .build();
   }
