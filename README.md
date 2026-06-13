@@ -36,8 +36,7 @@ https://github.com/user-attachments/assets/c61ef9a4-43ab-48d8-ab61-72433dc1cab0
 
 ### Backend
 
-- **Java 25**
-- **Spring Boot 4.0.2**
+- **Spring Boot**
 - **Spring Security** (OAuth2 Client)
 - **Spring Data JPA**
 - **Database**: PostgreSQL / MySQL (Runtime), H2 (Test)
