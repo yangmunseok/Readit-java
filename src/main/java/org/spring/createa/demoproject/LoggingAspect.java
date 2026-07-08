@@ -12,7 +12,7 @@ public class LoggingAspect {
 
   private Logger logger = Logger.getLogger(LoggingAspect.class.getName());
 
-  @Around("execution(* org.spring.createa.demoproject.service.Data4LibraryServiceAdapter.*(..))")
+  @Around("execution(* org.spring.createa.demoproject.service.Data4LibraryService.*(..))")
   public Object log(ProceedingJoinPoint joinPoint) throws Throwable {
     long start = System.currentTimeMillis();
     Object returnedByMethod = joinPoint.proceed();

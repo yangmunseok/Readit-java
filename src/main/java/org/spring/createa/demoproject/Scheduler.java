@@ -1,9 +1,13 @@
 package org.spring.createa.demoproject;
 
+import java.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spring.createa.demoproject.dto.response.PopularBookResponse;
-import org.spring.createa.demoproject.service.Data4LibraryServiceAdapter;
+import org.spring.createa.demoproject.service.Data4LibraryService;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -11,38 +15,33 @@ import org.springframework.stereotype.Component;
 public class Scheduler {
 
   private static final Logger logger = LoggerFactory.getLogger(Scheduler.class);
+  Data4LibraryService data4LibraryService;
+  JobOperator jobOperator;
+  Job saveDailyRanking;
 
-  Data4LibraryServiceAdapter data4LibraryServiceAdapter;
-
-  public Scheduler(Data4LibraryServiceAdapter data4LibraryServiceAdapter) {
-    this.data4LibraryServiceAdapter = data4LibraryServiceAdapter;
+  public Scheduler(Data4LibraryService data4LibraryService, JobOperator jobOperator,
+      Job saveDailyRanking) {
+    this.data4LibraryService = data4LibraryService;
+    this.jobOperator = jobOperator;
+    this.saveDailyRanking = saveDailyRanking;
   }
 
-  @Scheduled(fixedRate = 3600000 * 24)
+  @Scheduled(cron = "0 0 1 * * *")
   public void updateBookCache() {
     try {
-      logger.info("Cache update started");
-      for (int i = 0; i < 10; i++) {
-        try {
-          PopularBookResponse response = data4LibraryServiceAdapter.cachingGetPopularBooks(null,
-              Integer.toString(i));
-          logger.info("Cached books for category: {}", i);
-        } catch (Exception e) {
-          logger.error("Failed to cache books for category: {}", i, e);
-        }
-      }
-
+      logger.info("update started");
       try {
-        PopularBookResponse response = data4LibraryServiceAdapter.cachingGetPopularBooks(null,
-            "all");
-        logger.info("Cached all popular books");
+        JobParameters params = new JobParametersBuilder()
+            .addLocalDate("currentDate", LocalDate.now())
+            .toJobParameters();
+        jobOperator.start(saveDailyRanking, params);
+        logger.info("Saved books");
       } catch (Exception e) {
-        logger.error("Failed to cache all popular books", e);
+        logger.error("Failed to save books", e);
       }
-
-      logger.info("Cache update completed");
     } catch (Exception e) {
-      logger.error("Unexpected error during cache update", e);
+      logger.error("Unexpected error during updateBookCache", e);
     }
   }
+
 }

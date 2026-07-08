@@ -5,15 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
+import org.spring.createa.demoproject.domain.BookRanking;
+import org.spring.createa.demoproject.domain.BookRanking.Category;
 import org.spring.createa.demoproject.domain.User;
-import org.spring.createa.demoproject.dto.Book;
+import org.spring.createa.demoproject.dto.BookDTO;
 import org.spring.createa.demoproject.dto.Library;
 import org.spring.createa.demoproject.dto.UserPrincipal;
-import org.spring.createa.demoproject.dto.response.PopularBookResponse.Doc;
-import org.spring.createa.demoproject.dto.response.PopularBookResponse.RankedBook;
 import org.spring.createa.demoproject.dto.response.SearchLibrariesResponse;
+import org.spring.createa.demoproject.service.BookRankingService;
 import org.spring.createa.demoproject.service.CommentService;
-import org.spring.createa.demoproject.service.Data4LibraryServiceAdapter;
+import org.spring.createa.demoproject.service.Data4LibraryService;
 import org.spring.createa.demoproject.service.NaverBookSearchApi;
 import org.spring.createa.demoproject.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,8 @@ import org.springframework.web.server.ResponseStatusException;
 public class BookController {
 
   private final CommentService commentService;
-  Data4LibraryServiceAdapter data4LibraryServiceAdapter;
+  private final BookRankingService bookRankingService;
+  Data4LibraryService data4LibraryService;
   NaverBookSearchApi naverBookSearchApi;
   UserService userService;
 
@@ -42,13 +44,15 @@ public class BookController {
   String NAVER_LIBRARY_API_SECRET;
 
   @Autowired
-  public BookController(Data4LibraryServiceAdapter data4LibraryServiceAdapter,
+  public BookController(Data4LibraryService data4LibraryService,
       UserService userService,
-      CommentService commentService, NaverBookSearchApi naverBookSearchApi) {
-    this.data4LibraryServiceAdapter = data4LibraryServiceAdapter;
+      CommentService commentService, NaverBookSearchApi naverBookSearchApi,
+      BookRankingService bookRankingService) {
+    this.data4LibraryService = data4LibraryService;
     this.naverBookSearchApi = naverBookSearchApi;
     this.userService = userService;
     this.commentService = commentService;
+    this.bookRankingService = bookRankingService;
   }
 
 
@@ -56,10 +60,8 @@ public class BookController {
   String home(@AuthenticationPrincipal UserPrincipal user, Model model) {
 
     User currentUser = user.getUser();
-    List<Book> recommendBooks = getRecommendedBooks(currentUser.getBookOfInterest());
-    List<RankedBook> popularBooks = data4LibraryServiceAdapter.getPopularBooks(null, "all")
-        .response().docs().stream().map(
-            Doc::doc).limit(6).toList();
+    List<BookDTO> recommendBooks = getRecommendedBooks(currentUser.getBookOfInterest());
+    List<BookDTO> popularBooks = bookRankingService.getPopularBooks(6, BookRanking.Category.TOTAL);
     model.addAttribute("recommendedBooks", recommendBooks);
     model.addAttribute("bookRanks", popularBooks);
     model.addAttribute("user", currentUser);
@@ -70,7 +72,7 @@ public class BookController {
   String getBookByIsbn(@AuthenticationPrincipal UserPrincipal user, @PathVariable String isbn,
       Model model) {
     try {
-      Book book = data4LibraryServiceAdapter.getBookByIsbn(isbn).response().detail()
+      BookDTO book = data4LibraryService.getBookByIsbn(isbn).response().detail()
           .getFirst()
           .book();
       model.addAttribute("book", book);
@@ -86,18 +88,18 @@ public class BookController {
 
   @GetMapping("/books/popular")
   String getPopularBooks(@RequestParam(required = false) String category, Model model) {
-    Map<String, String> categories = Map.ofEntries(
-        Map.entry("전체", "all"),
-        Map.entry("총류", "0"),
-        Map.entry("철학", "1"),
-        Map.entry("종교", "2"),
-        Map.entry("사회과학", "3"),
-        Map.entry("자연과학", "4"),
-        Map.entry("기술과학", "5"),
-        Map.entry("예술", "6"),
-        Map.entry("언어", "7"),
-        Map.entry("문학", "8"),
-        Map.entry("역사", "9")
+    Map<String, BookRanking.Category> categories = Map.ofEntries(
+        Map.entry("전체", Category.TOTAL),
+        Map.entry("총류", Category.GENERAL_WORK),
+        Map.entry("철학", Category.PHILOSOPHY),
+        Map.entry("종교", Category.RELIGION),
+        Map.entry("사회과학", Category.SOCIAL_SCIENCE),
+        Map.entry("자연과학", Category.NATURAL_SCIENCE),
+        Map.entry("기술과학", Category.TECHNOLOGY),
+        Map.entry("예술", Category.ART),
+        Map.entry("언어", Category.LANGUAGE),
+        Map.entry("문학", Category.LITERATURE),
+        Map.entry("역사", Category.HISTORY)
     );
     List<String> categoriesList = List.of("전체",
         "총류",
@@ -114,9 +116,7 @@ public class BookController {
     if (category == null || categories.get(category) == null) {
       category = "전체";
     }
-    List<RankedBook> popularBooks = data4LibraryServiceAdapter.getPopularBooks(null,
-            categories.get(category)).response().docs().stream()
-        .map(doc -> doc.doc()).toList();
+    List<BookDTO> popularBooks = bookRankingService.getPopularBooks(100, categories.get(category));
 
     model.addAttribute("categories", categoriesList);
     model.addAttribute("currentCategory", category);
@@ -124,11 +124,11 @@ public class BookController {
     return "book-popular";
   }
 
-  List<Book> getRecommendedBooks(List<String> isbn) {
+  List<BookDTO> getRecommendedBooks(List<String> isbn) {
     if (isbn.isEmpty()) {
       return new ArrayList<>();
     }
-    return data4LibraryServiceAdapter.getBookRecommendation(
+    return data4LibraryService.getBookRecommendation(
             isbn.stream().reduce("", (a, b) -> a + ";" + b)).response().docs().stream()
         .map(doc -> doc.book()).toList();
   }
@@ -177,7 +177,7 @@ public class BookController {
   @GetMapping("/libraries")
   String searchLibraries(@RequestParam long isbn, @RequestParam int region,
       @RequestParam Integer dtlRegion, Model model) {
-    List<Library> libraries = data4LibraryServiceAdapter.searchLibraries(isbn, region, dtlRegion)
+    List<Library> libraries = data4LibraryService.searchLibraries(isbn, region, dtlRegion)
         .response().libs().stream().map(SearchLibrariesResponse.Doc::lib).toList();
     model.addAttribute("libraries", libraries);
     return "book-detail :: #available-libraries";

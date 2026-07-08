@@ -1,7 +1,7 @@
 package org.spring.createa.demoproject.dto.response;
 
 import java.util.List;
-import org.spring.createa.demoproject.dto.Book;
+import org.spring.createa.demoproject.dto.BookDTO;
 
 public record GetBookRecommendationResponse(Response response) {
 
@@ -9,7 +9,7 @@ public record GetBookRecommendationResponse(Response response) {
 
   }
 
-  public record Doc(Book book) {
+  public record Doc(BookDTO book) {
 
   }
 

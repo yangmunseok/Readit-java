@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.spring.createa.demoproject.service.Data4LibraryService;
+import org.spring.createa.demoproject.service.Data4LibraryServiceApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
@@ -15,11 +15,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @Disabled("현재로서는 불필요")
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {Data4LibraryService.class})
+@ContextConfiguration(classes = {Data4LibraryServiceApi.class})
 public class BookMaruApiTest {
 
   @Autowired
-  Data4LibraryService bookMaruApi;
+  Data4LibraryServiceApi bookMaruApi;
 
   @Value("${api.data4library.key}")
   String AUTH_KEY;

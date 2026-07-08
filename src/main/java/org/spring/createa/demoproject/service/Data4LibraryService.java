@@ -1,43 +1,69 @@
 package org.spring.createa.demoproject.service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+import org.spring.createa.demoproject.Repository.BookRepository;
+import org.spring.createa.demoproject.dto.BookDTO;
 import org.spring.createa.demoproject.dto.response.GetBookRecommendationResponse;
-import org.spring.createa.demoproject.dto.response.PopularBookResponse;
 import org.spring.createa.demoproject.dto.response.SearchBooksResponse;
 import org.spring.createa.demoproject.dto.response.SearchDetailResponse;
 import org.spring.createa.demoproject.dto.response.SearchLibrariesResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.service.annotation.GetExchange;
-import org.springframework.web.service.annotation.HttpExchange;
 
 @Service
-@HttpExchange(value = "http://data4library.kr/api/")
-public interface Data4LibraryService {
+@Slf4j
+public class Data4LibraryService {
 
-  @GetExchange("/srchDtlList")
-  SearchDetailResponse getBookByIsbn(@RequestParam String isbn13, @RequestParam String authKey,
-      @RequestParam String format);
+  Data4LibraryServiceApi data4LibraryServiceApi;
+  BookRepository bookRepository;
 
-  @GetExchange("/loanItemSrch")
-  PopularBookResponse getPopularBooks(@RequestParam(required = false) Integer pageSize,
-      @RequestParam(required = false) String kdc, @RequestParam String authKey,
-      @RequestParam String format);
+  @Value("${api.data4library.key}")
+  String authKey;
+  String format = "json";
 
-  @GetExchange("/srchBooks?exactMatch=true")
-  SearchBooksResponse searchBooks(@RequestParam(required = false) String isbn13,
-      @RequestParam(required = false) List<String> keyword,
-      @RequestParam(required = false) String publisher,
-      @RequestParam(required = false) Integer pageNo,
-      @RequestParam(required = false) Integer pageSize,
-      @RequestParam String authKey, @RequestParam String format);
+  public Data4LibraryService(Data4LibraryServiceApi data4LibraryServiceApi,
+      BookRepository bookRepository) {
+    this.data4LibraryServiceApi = data4LibraryServiceApi;
+    this.bookRepository = bookRepository;
+  }
 
-  @GetExchange("/recommandList")
-  GetBookRecommendationResponse getBookRecommendation(@RequestParam String isbn13,
-      @RequestParam String authKey, @RequestParam String format);
+  public SearchDetailResponse getBookByIsbn(String isbn13) {
+    return data4LibraryServiceApi.getBookByIsbn(isbn13, authKey, format);
+  }
 
-  @GetExchange("/libSrchByBook")
-  SearchLibrariesResponse searchLibraries(@RequestParam long isbn, @RequestParam int region,
-      @RequestParam int dtl_region,
-      @RequestParam String authKey, @RequestParam String format);
+  @NonNull
+  public Set<BookDTO> searchPopularBooksWithAPI(Integer size, String kdc) {
+    Set<BookDTO> books = data4LibraryServiceApi
+        .getPopularBooks(size, kdc, authKey, format)
+        .response()
+        .docs()
+        .stream()
+        .map(doc -> {
+          return doc.doc().toBook();
+        })
+        .collect(Collectors.toSet());
+    return books;
+  }
+
+  @Deprecated
+  public SearchBooksResponse searchBooks(String isbn13,
+      List<String> keyword,
+      String publisher,
+      Integer pageNo,
+      Integer pageSize) {
+    return data4LibraryServiceApi.searchBooks(isbn13, keyword, publisher, pageNo, pageSize, authKey,
+        format);
+  }
+
+  public GetBookRecommendationResponse getBookRecommendation(String isbn13) {
+    return data4LibraryServiceApi.getBookRecommendation(isbn13, authKey, format);
+  }
+
+  public SearchLibrariesResponse searchLibraries(long isbn, int region, int dtl_region) {
+    return data4LibraryServiceApi.searchLibraries(isbn, region, dtl_region, authKey, format);
+  }
 }
