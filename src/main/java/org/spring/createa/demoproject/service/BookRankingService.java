@@ -1,5 +1,6 @@
 package org.spring.createa.demoproject.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.NonNull;
-import org.spring.createa.demoproject.Repository.BookRankingRankingRepository;
+import org.spring.createa.demoproject.Repository.BookRankingRepository;
 import org.spring.createa.demoproject.Repository.BookRepository;
 import org.spring.createa.demoproject.domain.Book;
 import org.spring.createa.demoproject.domain.BookRanking;
@@ -22,10 +23,10 @@ public class BookRankingService {
 
   BookRepository bookRepository;
   Data4LibraryService data4LibraryService;
-  BookRankingRankingRepository bookRankingRepository;
+  BookRankingRepository bookRankingRepository;
 
   public BookRankingService(BookRepository bookRepository, Data4LibraryService data4LibraryService,
-      BookRankingRankingRepository bookRankingRepository) {
+      BookRankingRepository bookRankingRepository) {
     this.bookRepository = bookRepository;
     this.data4LibraryService = data4LibraryService;
     this.bookRankingRepository = bookRankingRepository;
@@ -72,6 +73,7 @@ public class BookRankingService {
 
     bookRepository.saveAll(newBook);
     bookRankingRepository.saveAll(rankings);
+    bookRankingRepository.deleteAllByCategoryAndCreatedAtBefore(category, LocalDate.now());
   }
 
   private static @NonNull List<String> extractIsbn13s(Set<BookDTO> popularBooks) {

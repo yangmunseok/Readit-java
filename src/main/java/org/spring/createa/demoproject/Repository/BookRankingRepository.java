@@ -1,11 +1,14 @@
 package org.spring.createa.demoproject.Repository;
 
+import java.time.LocalDate;
 import org.spring.createa.demoproject.domain.BookRanking;
+import org.spring.createa.demoproject.domain.BookRanking.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface BookRankingRankingRepository extends JpaRepository<BookRanking, Integer>,
+public interface BookRankingRepository extends JpaRepository<BookRanking, Integer>,
     BookRankingRepositoryUsingQuerydsl {
 
+  Integer deleteAllByCategoryAndCreatedAtBefore(Category category, LocalDate createdAtBefore);
 }
 
 //설계부터 하자.
