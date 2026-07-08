@@ -2,6 +2,8 @@
 
 Readit은 도서 검색부터 실시간 도서관 소장 정보 확인, 그리고 사용자 리뷰 공유까지 한 곳에서 해결할 수 있는 웹 어플리케이션입니다.
 
+https://github.com/user-attachments/assets/b1dba653-7ad1-4566-95b5-cf9d3d02eeea
+
 ## 🚀 주요 기능
 
 ### 1. 도서 검색 및 정보 조회
@@ -17,6 +19,10 @@ Readit은 도서 검색부터 실시간 도서관 소장 정보 확인, 그리�
 
 ### 3. 사용자 리뷰 및 큐레이션
 
+https://github.com/user-attachments/assets/5e8fc081-3f16-4f85-a731-a76d7ad66446
+
+https://github.com/user-attachments/assets/c61ef9a4-43ab-48d8-ab61-72433dc1cab0
+
 - 도서별 별점 및 텍스트 리뷰 작성 기능.
 - **맞춤형 추천**: 사용자의 최근 조회 기록을 바탕으로 좋아할 만한 도서 추천.
 - **실시간 랭킹**: 현재 인기 있는 도서 목록 제공.
@@ -30,8 +36,7 @@ Readit은 도서 검색부터 실시간 도서관 소장 정보 확인, 그리�
 
 ### Backend
 
-- **Java 25**
-- **Spring Boot 4.0.2**
+- **Spring Boot**
 - **Spring Security** (OAuth2 Client)
 - **Spring Data JPA**
 - **Database**: PostgreSQL / MySQL (Runtime), H2 (Test)
