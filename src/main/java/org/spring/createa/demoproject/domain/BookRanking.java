@@ -17,7 +17,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(indexes = {
-    @Index(name = "rank_created_at_category_idx", columnList = "created_at, category")})
+    @Index(name = "rank_created_at_category_ranking_idx", columnList = "created_at, category, ranking")})
 public class BookRanking {
 
   public static enum Category {

@@ -22,6 +22,7 @@ public class BookRankingRepositoryUsingQuerydslImpl implements BookRankingReposi
 
     List<BookRanking> bookRankings = queryFactory
         .selectFrom(rank)
+        .join(rank.book).fetchJoin()
         .orderBy(rank.ranking.asc())
         .limit(size)
         .where(rank.createdAt.eq(today).and(rank.category.eq(category)))
@@ -31,6 +32,7 @@ public class BookRankingRepositoryUsingQuerydslImpl implements BookRankingReposi
       LocalDate yesterday = LocalDate.now().minusDays(1);
       List<BookRanking> yesterdayBookRankings = queryFactory
           .selectFrom(rank)
+          .join(rank.book).fetchJoin()
           .orderBy(rank.ranking.asc())
           .limit(size)
           .where(rank.createdAt.eq(yesterday).and(rank.category.eq(category)))
