@@ -8,17 +8,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.spring.createa.demoproject.Repository.BookRankingRepository;
 import org.spring.createa.demoproject.Repository.BookRepository;
 import org.spring.createa.demoproject.domain.Book;
 import org.spring.createa.demoproject.domain.BookRanking;
 import org.spring.createa.demoproject.dto.BookDTO;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 public class BookRankingService {
 
   BookRepository bookRepository;
@@ -90,9 +94,15 @@ public class BookRankingService {
             Function.identity()));
   }
 
+  @Cacheable("bookRankings")
   public List<BookDTO> getPopularBooks(int size, BookRanking.Category category) {
+    log.info("getPopularBooks invoked with parameter size:{} category:{}", size, category);
     return bookRankingRepository.getPopularBooks(size, category).stream()
         .map(bookRanking -> (Book.from(bookRanking.getBook(), bookRanking.getRanking())))
         .toList();
+  }
+
+  @CacheEvict(value = "bookRankings", allEntries = true)
+  public void refreshBookCache() {
   }
 }

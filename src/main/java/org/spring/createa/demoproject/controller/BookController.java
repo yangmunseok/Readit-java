@@ -143,15 +143,6 @@ public class BookController {
       @AuthenticationPrincipal UserPrincipal userPrincipal,
       Model model) {
 
-    /*
-    var searchResult = data4LibraryServiceAdapter.searchBooks(isbn13, keyword, publisher, pageNo,
-        pageSize).response();
-
-    List<Book> books = searchResult.docs().stream().map(
-        BookDoc::doc).toList();
-    model.addAttribute("books", books);
-  */
-
     if (pageNo == null) {
       pageNo = 1;
     }

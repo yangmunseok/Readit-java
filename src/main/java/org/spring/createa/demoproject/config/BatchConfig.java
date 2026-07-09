@@ -1,5 +1,6 @@
 package org.spring.createa.demoproject.config;
 
+import org.spring.createa.demoproject.BatchListener;
 import org.spring.createa.demoproject.service.BookRankingService;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -18,6 +19,7 @@ public class BatchConfig {
   private final JobRepository jobRepository;
   private final PlatformTransactionManager transactionManager;
   private final BookRankingService bookRankingService;
+  private final BatchListener batchListener;
   private final RetryTemplate retryTemplate =
       RetryTemplate.builder()
           .maxAttempts(3)
@@ -25,10 +27,11 @@ public class BatchConfig {
           .build();
 
   public BatchConfig(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-      BookRankingService bookRankingService) {
+      BookRankingService bookRankingService, BatchListener batchListener) {
     this.jobRepository = jobRepository;
     this.transactionManager = transactionManager;
     this.bookRankingService = bookRankingService;
+    this.batchListener = batchListener;
   }
 
   @Bean
@@ -45,6 +48,7 @@ public class BatchConfig {
         .next(saveDailyCategoryRanking("7"))
         .next(saveDailyCategoryRanking("8"))
         .next(saveDailyCategoryRanking("9"))
+        .listener(batchListener)
         .build();
   }
 
@@ -70,6 +74,6 @@ public class BatchConfig {
           return RepeatStatus.FINISHED;
         }, transactionManager).build();
   }
-
+  
 }
 
