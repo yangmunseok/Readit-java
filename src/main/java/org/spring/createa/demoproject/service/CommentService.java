@@ -1,15 +1,20 @@
 package org.spring.createa.demoproject.service;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 import org.spring.createa.demoproject.Repository.CommentRepository;
 import org.spring.createa.demoproject.Repository.UserRepository;
 import org.spring.createa.demoproject.domain.Comment;
 import org.spring.createa.demoproject.domain.User;
+import org.spring.createa.demoproject.exception.CommentAccessDeniedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 @Service
+@Validated
 public class CommentService {
 
   CommentRepository commentRepository;
@@ -21,14 +26,9 @@ public class CommentService {
     this.userRepository = userRepository;
   }
 
-  public void addComment(String isbn13, String comment, int score, User commenter) {
-    Comment newComment = new Comment();
-    newComment.setIsbn13(isbn13);
-    newComment.setContent(comment);
-    newComment.setScore(score);
-    newComment.setCommenter(commenter);
-
-    commentRepository.save(newComment);
+  public Comment addComment(String isbn13, String comment, int score, User commenter) {
+    Comment newComment = new Comment(isbn13, comment, score, commenter);
+    return commentRepository.save(newComment);
   }
 
   @Transactional
@@ -50,30 +50,37 @@ public class CommentService {
   }
 
   @Transactional
-  public int deleteCommentById(Comment exComment, User user) {
+  public void deleteCommentById(int commentId, User user) {
+    Comment exComment = commentRepository.findCommentById(commentId);
     if (!exComment.getCommenter().equals(user)) {
-      return -1;
+      throw new CommentAccessDeniedException("다른 사람의 댓글을 삭제할 수 없습니다.");
     }
-    return commentRepository.deleteCommentById(exComment.getId());
+    commentRepository.deleteCommentById(exComment.getId());
   }
 
   @Transactional
-  public int patchComment(Comment exComment, String content, Integer score, User user) {
+  public Comment patchComment(int commentId, String content,
+      @Min(value = 1, message = "별점은 최소 1점이어야 합니다.")
+      @Max(value = 5, message = "별점은 최대 5점이어야 합니다.") Integer score, User user) {
+    Comment exComment = commentRepository.findCommentById(commentId);
     if (!exComment.getCommenter().equals(user)) {
-      return -1;
-    }
-    if (content != null) {
-      exComment.setContent(content);
-    }
-    if (score != null && score > 0 && score < 6) {
-      exComment.setScore(score);
+      throw new CommentAccessDeniedException("다른 사람의 댓글을 변경할 수 없습니다.");
     }
 
-    commentRepository.save(exComment);
-    return 1;
+    content = (content == null) ? exComment.getContent() : content;
+    score = (score == null) ? exComment.getScore() : score;
+
+    exComment.setContent(content);
+    exComment.setScore(score);
+
+    return commentRepository.save(exComment);
   }
 
   public Comment findCommentById(int id) {
     return commentRepository.findCommentById(id);
+  }
+
+  public Comment findCommentByIdWithCommenterAndLiker(int id) {
+    return commentRepository.findCommentByIdWithCommenterAndLiker(id);
   }
 }

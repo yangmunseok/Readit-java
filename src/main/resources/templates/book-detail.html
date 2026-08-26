@@ -112,15 +112,15 @@
             class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-10 border-t-2 border-t-stone-200 pt-5">
           <div class="flex justify-between">
             <p class="font-bold text-lg">출판사</p>
-            <p th:text="${book.publisher}"/>
+            <p id="publisher" th:text="${book.publisher}"/>
           </div>
           <div class="flex justify-between">
             <p class="font-bold text-lg">출판일</p>
-            <p th:text="${book.publication_date}"/>
+            <p id="publication-date" th:text="${book.publication_date}"/>
           </div>
           <div class="flex justify-between">
             <p class="font-bold text-lg">ISBN-13</p>
-            <p th:text="${book.isbn13}"/>
+            <p id="isbn13" th:text="${book.isbn13}"/>
           </div>
         </div>
       </div>

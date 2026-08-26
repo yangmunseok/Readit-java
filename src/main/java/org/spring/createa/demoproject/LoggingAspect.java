@@ -12,15 +12,6 @@ public class LoggingAspect {
 
   private Logger logger = Logger.getLogger(LoggingAspect.class.getName());
 
-  @Around("execution(* org.spring.createa.demoproject.service.Data4LibraryService.*(..))")
-  public Object log(ProceedingJoinPoint joinPoint) throws Throwable {
-    long start = System.currentTimeMillis();
-    Object returnedByMethod = joinPoint.proceed();
-    logger.info(joinPoint.getSignature().getName() + " took " + Long.toString(
-        System.currentTimeMillis() - start) + "ms");
-    return returnedByMethod;
-  }
-
   @Around("execution(* org.spring.createa.demoproject.controller.*.*(..))")
   public Object controllerLog(ProceedingJoinPoint joinPoint) throws Throwable {
     logger.info(joinPoint.getSignature().getName() + " invoked");

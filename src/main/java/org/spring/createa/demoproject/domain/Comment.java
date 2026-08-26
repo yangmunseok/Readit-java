@@ -8,8 +8,8 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import lombok.Data;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
@@ -34,7 +34,7 @@ public class Comment {
   Date updatedAt;
 
   @ManyToMany
-  List<User> liker;
+  Set<User> liker;
 
   @ManyToOne
   User commenter;
@@ -51,6 +51,16 @@ public class Comment {
   @Override
   public int hashCode() {
     return Objects.hashCode(id);
+  }
+
+  public Comment(String isbn13, String content, Integer score, User commenter) {
+    this.isbn13 = isbn13;
+    this.content = content;
+    this.score = score;
+    this.commenter = commenter;
+  }
+
+  public Comment() {
   }
 
   @Override

@@ -9,9 +9,10 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import lombok.Data;
 
 @Entity
@@ -30,25 +31,32 @@ public class User {
   private String name;
   private String role;
   private String provider = "local";
-  private List<String> bookOfInterest;
-
+  private String bookOfInterest;
   @OneToMany(mappedBy = "commenter")
-  private List<Comment> comment;
+  private List<Comment> comment = new ArrayList<>();
 
   @ManyToMany(mappedBy = "liker")
-  private List<Comment> like;
+  private Set<Comment> like = new HashSet<>();
 
   public User() {
   }
 
-  public User(String email, String name, String role, String provider) {
+  public User(String email, String name, String role, String provider, String password) {
     this.email = email;
     this.name = name;
     this.role = role;
     this.provider = provider;
-    this.bookOfInterest = new LinkedList<>();
-    this.comment = new LinkedList<>();
-    this.like = new LinkedList<>();
+    this.password = password;
+  }
+
+  public void addSearchHistory(String isbn) {
+    if (bookOfInterest == null) {
+      bookOfInterest = isbn;
+    }
+    if (bookOfInterest.contains(isbn)) {
+      return;
+    }
+    bookOfInterest += "," + isbn;
   }
 
   @Override
@@ -76,12 +84,5 @@ public class User {
         ", provider='" + provider + '\'' +
         ", bookOfInterest=" + bookOfInterest +
         '}';
-  }
-
-  public List<String> getBookOfInterest() {
-    if (bookOfInterest == null) {
-      return new ArrayList<>();
-    }
-    return bookOfInterest;
   }
 }

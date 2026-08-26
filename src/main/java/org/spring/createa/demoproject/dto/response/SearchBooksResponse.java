@@ -3,6 +3,7 @@ package org.spring.createa.demoproject.dto.response;
 import java.util.List;
 import org.spring.createa.demoproject.dto.BookDTO;
 
+@Deprecated
 public record SearchBooksResponse(
     Response response
 ) {

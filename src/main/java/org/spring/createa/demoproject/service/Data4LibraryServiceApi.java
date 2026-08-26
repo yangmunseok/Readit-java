@@ -19,11 +19,13 @@ public interface Data4LibraryServiceApi {
   SearchDetailResponse getBookByIsbn(@RequestParam String isbn13, @RequestParam String authKey,
       @RequestParam String format);
 
+
   @GetExchange("/loanItemSrch")
   PopularBookResponse getPopularBooks(@RequestParam(required = false) Integer pageSize,
       @RequestParam(required = false) String kdc, @RequestParam String authKey,
       @RequestParam String format);
 
+  @Deprecated
   @GetExchange("/srchBooks?exactMatch=true")
   SearchBooksResponse searchBooks(@RequestParam(required = false) String isbn13,
       @RequestParam(required = false) List<String> keyword,
@@ -37,7 +39,7 @@ public interface Data4LibraryServiceApi {
       @RequestParam String authKey, @RequestParam String format);
 
   @GetExchange("/libSrchByBook")
-  SearchLibrariesResponse searchLibraries(@RequestParam long isbn, @RequestParam int region,
-      @RequestParam int dtl_region,
+  SearchLibrariesResponse searchLibraries(@RequestParam String isbn, @RequestParam String region,
+      @RequestParam String dtl_region,
       @RequestParam String authKey, @RequestParam String format);
 }

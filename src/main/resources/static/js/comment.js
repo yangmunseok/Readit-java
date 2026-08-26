@@ -103,8 +103,8 @@ function likeOrUnlikeReview(id, csrf_header, csrf_token) {
       [csrf_header]: csrf_token,
       "Content-Type": "application/json"
     }
-  }).then(async (body) => {
-    const html = await body.text();
-    document.querySelector("#comment-box-" + id).outerHTML = html;
+  }).then((body) => {
+    body.text().then(
+        html => document.querySelector("#comment-box-" + id).outerHTML = html);
   });
 }

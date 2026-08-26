@@ -38,10 +38,11 @@ public class CustomOidcUserService extends OidcUserService {
     if (exUser == null) {
       User newUser = new User((String) claims.get("email"),
           (String) claims.getOrDefault("name", claims.get("nickname")), "USER",
-          provider);
+          provider, null);
       userService.register(newUser);
       return builder.user(newUser).build();
     }
     return builder.user(exUser).build();
+
   }
 }

@@ -9,6 +9,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Objects;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
@@ -20,18 +21,33 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
     @Index(name = "rank_created_at_category_ranking_idx", columnList = "created_at, category, ranking")})
 public class BookRanking {
 
+  @Getter
   public static enum Category {
-    GENERAL_WORK,
-    PHILOSOPHY,
-    RELIGION,
-    SOCIAL_SCIENCE,
-    NATURAL_SCIENCE,
-    TECHNOLOGY,
-    ART,
-    LANGUAGE,
-    LITERATURE,
-    HISTORY,
-    TOTAL
+    TOTAL("전체"),
+    GENERAL_WORK("총류"),
+    PHILOSOPHY("철학"),
+    RELIGION("종교"),
+    SOCIAL_SCIENCE("사회과학"),
+    NATURAL_SCIENCE("자연과학"),
+    TECHNOLOGY("기술과학"),
+    ART("예술"),
+    LANGUAGE("언어"),
+    LITERATURE("문학"),
+    HISTORY("역사");
+
+    private final String value;
+
+    Category(String value) {
+      this.value = value;
+    }
+
+    public static Category from(String value) {
+      return Arrays.stream(values())
+          .filter(c -> c.value.equals(value))
+          .findFirst()
+          .orElseThrow();
+    }
+
   }
 
   @Id

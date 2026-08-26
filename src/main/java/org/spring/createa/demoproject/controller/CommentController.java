@@ -1,6 +1,8 @@
 package org.spring.createa.demoproject.controller;
 
+import jakarta.validation.Valid;
 import org.spring.createa.demoproject.domain.Comment;
+import org.spring.createa.demoproject.domain.User;
 import org.spring.createa.demoproject.dto.UserPrincipal;
 import org.spring.createa.demoproject.dto.request.DeleteCommentRequestBody;
 import org.spring.createa.demoproject.dto.request.PatchCommentRequestBody;
@@ -17,11 +19,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class CommentController {
 
+  public static final String COMPONENT_BOX_COMMENT_BOX = "component/box :: commentBox";
   CommentService commentService;
 
   @Autowired
@@ -29,44 +31,37 @@ public class CommentController {
     this.commentService = commentService;
   }
 
+  @ModelAttribute
+  User populateUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+    return userPrincipal.getUser();
+  }
+
   @PostMapping("/comments")
-  String postComment(@ModelAttribute PostCommentRequestBody body,
-      @AuthenticationPrincipal UserPrincipal userPrincipal, RedirectAttributes redirectAttributes) {
-    if (body.comment().isBlank() || body.score() == null) {
-      redirectAttributes.addFlashAttribute("error", "댓글 내용이나 점수가 입력되지 않았습니다.");
-      return "redirect:/books/" + body.isbn13();
-    }
-    commentService.addComment(body.isbn13(), body.comment(), body.score(), userPrincipal.getUser());
+  String postComment(@ModelAttribute @Valid PostCommentRequestBody body,
+      @ModelAttribute User user) {
+    commentService.addComment(body.isbn13(), body.comment(), body.score(), user);
     return "redirect:/books/" + body.isbn13();
   }
 
   @PostMapping("/comments/{id}/likeOrUnlike")
-  String likeOrUnlikeComment(@PathVariable int id,
-      @AuthenticationPrincipal UserPrincipal userPrincipal, Model model) {
-    commentService.likeOrUnlikeComment(id, userPrincipal.getUser());
-    model.addAttribute("user", userPrincipal.getUser());
+  String likeOrUnlikeComment(@PathVariable int id, @ModelAttribute User user, Model model) {
+    commentService.likeOrUnlikeComment(id, user);
     model.addAttribute("comment", commentService.findCommentById(id));
-    return "component/box :: commentBox";
+    return COMPONENT_BOX_COMMENT_BOX;
   }
 
   @ResponseBody
   @DeleteMapping("/comments")
   void deleteComment(@RequestBody DeleteCommentRequestBody body,
-      @AuthenticationPrincipal UserPrincipal userPrincipal) {
-    System.out.println("deleteComment() invoked");
-    Comment exComment = commentService.findCommentById(body.id());
-    commentService.deleteCommentById(exComment, userPrincipal.getUser());
+      @ModelAttribute User user) {
+    commentService.deleteCommentById(body.id(), user);
   }
 
   @PatchMapping("/comments")
   String patchComment(PatchCommentRequestBody body,
-      @AuthenticationPrincipal UserPrincipal userPrincipal, Model model) {
-    System.out.println("patchComment invoked");
-    Comment exComment = commentService.findCommentById(body.id());
-    System.out.println(exComment);
-    commentService.patchComment(exComment, body.content(), body.score(), userPrincipal.getUser());
-    model.addAttribute("user", userPrincipal.getUser());
-    model.addAttribute("comment", exComment);
-    return "redirect:/books/" + exComment.getIsbn13();
+      @ModelAttribute User user, Model model) {
+    Comment comment = commentService.patchComment(body.id(), body.content(), body.score(), user);
+    model.addAttribute("comment", comment);
+    return "redirect:/books/" + comment.getIsbn13();
   }
 }

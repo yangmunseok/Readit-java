@@ -8,10 +8,11 @@ import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 
 @Service
-@HttpExchange(value = "https://openapi.naver.com/v1")
+@Deprecated
+@HttpExchange(url = "https://openapi.naver.com/v1")
 public interface NaverBookSearchApi {
 
-  @GetExchange("/search/book.json")
+  @GetExchange(url = "/search/book.json")
   NaverSearchBookResponse searchBooks(@RequestParam String query,
       @RequestParam(required = false) Integer start,
       @RequestParam(required = false) Integer display,

@@ -9,27 +9,27 @@
 </head>
 <body>
 <a th:fragment="bookBox(book)"
-   th:href="@{/books/{isbn}(isbn=${book.isbn})}"
+   th:href="@{/books/{isbn}(isbn=${book.isbn13})}"
    class="flex items-start w-full gap-5 lg:gap-20 border-b border-stone-500 py-5">
 
   <!-- 이미지 -->
   <div
       class="shrink-0 w-30 lg:w-45 aspect-[2/3] overflow-hidden bg-stone-200 flex justify-center items-center">
     <img
-        th:src="${book.image}"
+        th:src="${book.bookImageURL}"
         class="w-full h-full object-contain"
     />
   </div>
 
   <!-- 텍스트 (좌측 정렬) -->
   <div class="flex flex-col gap-1 text-left w-full">
-    <span th:text="${book.title}" class="font-bold text-base lg:text-lg"></span>
+    <span th:text="${book.bookname}" class="font-bold text-base lg:text-lg"></span>
 
     <!--span th:if="${book.vol != null}"
           th:text="${book.vol}"
           class="font-bold text-base lg:text-lg"></span-->
 
-    <p th:text="${book.author}"
+    <p th:text="${book.authors}"
        class="text-xs lg:text-sm text-stone-400"></p>
 
     <p th:text="${book.description}"

@@ -13,4 +13,8 @@ public record GetBookRecommendationResponse(Response response) {
 
   }
 
+  public List<BookDTO> books() {
+    return this.response.docs.stream().map(Doc::book).toList();
+  }
+
 }

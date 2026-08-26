@@ -12,4 +12,8 @@ public record SearchDetailResponse(Response response) {
   public record Detail(BookDTO book) {
 
   }
+
+  public List<BookDTO> books() {
+    return this.response.detail.stream().map(Detail::book).toList();
+  }
 }
